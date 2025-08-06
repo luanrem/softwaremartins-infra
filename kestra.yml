@@ -1,4 +1,4 @@
-https://github.com/luanrem/softwaremartins-infra.version: "3.8"
+version: "3.8"
 
 networks:
   network_public:
