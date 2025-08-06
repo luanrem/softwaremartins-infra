@@ -1,0 +1,45 @@
+# Ignore .env files with secrets
+.env
+
+# Ignore Docker-related artifacts
+**/*-data/
+**/docker-data/
+**/kestra-data/
+**/postgres-data/
+**/kestra-wd/
+**/tmp/
+**/logs/
+**/storage/
+
+# Ignore macOS system files
+.DS_Store
+
+# Ignore Linux trash
+.Trash-*
+
+# Ignore editor files
+.vscode/
+.idea/
+*.swp
+
+# Ignore Traefik certificate storage (if local, not in volume)
+acme.json
+
+# Node/npm cache (if you add scripts later)
+node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# Ignore any local override Compose files
+docker-compose.override.yml
+
+# Ignore backup files
+*.bak
+*.backup
+*.old
+*~
+
+# Ignore test output
+*.out
+*.log

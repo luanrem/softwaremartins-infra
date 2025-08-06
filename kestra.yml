@@ -1,0 +1,73 @@
+https://github.com/luanrem/softwaremartins-infra.version: "3.8"
+
+networks:
+  network_public:
+    external: true
+  kestra_net:
+
+volumes:
+  postgres-data:
+  kestra-data:
+  kestra-wd:
+
+services:
+  postgres:
+    image: postgres:16
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: ${KESTRA_DB}
+      POSTGRES_USER: ${KESTRA_USER}
+      POSTGRES_PASSWORD: ${KESTRA_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U kestra -d kestra"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - kestra_net
+
+  kestra:
+    image: kestra/kestra:latest
+    user: "root"
+    command: ["server", "standalone"]
+    volumes:
+      - kestra-data:/app/storage
+      - /var/run/docker.sock:/var/run/docker.sock
+      - kestra-wd:/tmp/kestra-wd
+    environment:
+      KESTRA_CONFIGURATION: |
+        datasources:
+          postgres:
+            url: jdbc:postgresql://postgres:5432/kestra
+            username: ${KESTRA_USER}
+            password: ${KESTRA_PASSWORD}
+        kestra:
+          server:
+            basicAuth:
+              enabled: false
+          repository:
+            type: postgres
+          queue:
+            type: postgres
+          storage:
+            type: local
+            local:
+              basePath: "/app/storage"
+          tasks:
+            tmpDir:
+              path: "/tmp/kestra-wd/tmp"
+          url: "http://${KESTRA_URL}"
+    depends_on:
+      - postgres
+    networks:
+      - kestra_net
+      - network_public
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.kestra.rule=Host(`${KESTRA_URL}`)"
+      - "traefik.http.routers.kestra.entrypoints=websecure"
+      - "traefik.http.routers.kestra.tls.certresolver=letsencryptresolver"
+      - "traefik.http.services.kestra.loadbalancer.server.port=8080"
+      - "traefik.http.services.kestra.loadbalancer.passhostheader=true"
