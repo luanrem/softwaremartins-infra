@@ -58,7 +58,7 @@ services:
           tasks:
             tmpDir:
               path: "/tmp/kestra-wd/tmp"
-          url: "http://${KESTRA_URL}"
+          url: "https://${KESTRA_URL}"
     depends_on:
       - postgres
     networks:
@@ -66,7 +66,7 @@ services:
       - network_public
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.kestra.rule=Host(`${KESTRA_URL}`)"
+      - "traefik.http.routers.kestra.rule=Host(${KESTRA_URL})"
       - "traefik.http.routers.kestra.entrypoints=websecure"
       - "traefik.http.routers.kestra.tls.certresolver=letsencryptresolver"
       - "traefik.http.services.kestra.loadbalancer.server.port=8080"
