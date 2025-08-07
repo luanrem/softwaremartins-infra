@@ -45,6 +45,9 @@ services:
             password: ${KESTRA_PASSWORD}
         kestra:
           server:
+            cors:
+              enabled: true
+              allowedOrigins: ["*"]
             basicAuth:
               enabled: false
           repository:
