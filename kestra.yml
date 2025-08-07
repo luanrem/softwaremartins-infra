@@ -45,8 +45,6 @@ services:
             password: ${KESTRA_PASSWORD}
         kestra:
           server:
-            cors:
-              enabled: true
             basicAuth:
               enabled: false
           repository:
@@ -61,6 +59,10 @@ services:
             tmpDir:
               path: "/tmp/kestra-wd/tmp"
           url: "https://${KESTRA_URL}"
+        micronaut:
+          server:
+            cors:
+              enabled: true
     networks:
       - network_public
     deploy:
