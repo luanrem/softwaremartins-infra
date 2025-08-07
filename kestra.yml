@@ -31,7 +31,7 @@ services:
   kestra:
     image: kestra/kestra:latest
     user: "root"
-    command: ["server", "standalone", "--port", "8082"]
+    command: ["server", "standalone"]
     volumes:
       - kestra-data:/app/storage
       - /var/run/docker.sock:/var/run/docker.sock
@@ -45,6 +45,7 @@ services:
             password: ${KESTRA_PASSWORD}
         kestra:
           server:
+            port: 8082
             basicAuth:
               enabled: false
           repository:
@@ -58,7 +59,7 @@ services:
           tasks:
             tmpDir:
               path: "/tmp/kestra-wd/tmp"
-          url: "https://${KESTRA_URL}:8082"
+          url: "https://localhost:8082"
     depends_on:
       - postgres
     networks:
