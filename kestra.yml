@@ -20,7 +20,7 @@ services:
       POSTGRES_USER: ${KESTRA_USER}
       POSTGRES_PASSWORD: ${KESTRA_PASSWORD}
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U kestra -d kestra"]
+      test: ["CMD-SHELL", "pg_isready -U ${KESTRA_USER} -d ${KESTRA_DB}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -31,7 +31,7 @@ services:
   kestra:
     image: kestra/kestra:latest
     user: "root"
-    command: ["server", "standalone"]
+    command: ["server", "standalone", "--port", "${KESTRA_PORT}"]
     volumes:
       - kestra-data:/app/storage
       - /var/run/docker.sock:/var/run/docker.sock
@@ -40,11 +40,12 @@ services:
       KESTRA_CONFIGURATION: |
         datasources:
           postgres:
-            url: jdbc:postgresql://postgres:5432/kestra
+            url: jdbc:postgresql://postgres:5432/${KESTRA_DB}
             username: ${KESTRA_USER}
             password: ${KESTRA_PASSWORD}
         kestra:
           server:
+            port: ${KESTRA_PORT}
             basicAuth:
               enabled: false
           repository:
@@ -58,7 +59,7 @@ services:
           tasks:
             tmpDir:
               path: "/tmp/kestra-wd/tmp"
-          url: "https://${KESTRA_URL}"
+          url: "https://${KESTRA_URL}:${KESTRA_PORT}"
     depends_on:
       - postgres
     networks:
@@ -69,5 +70,5 @@ services:
       - "traefik.http.routers.kestra.rule=Host(${KESTRA_URL})"
       - "traefik.http.routers.kestra.entrypoints=websecure"
       - "traefik.http.routers.kestra.tls.certresolver=letsencryptresolver"
-      - "traefik.http.services.kestra.loadbalancer.server.port=8080"
+      - "traefik.http.services.kestra.loadbalancer.server.port=${KESTRA_PORT}"
       - "traefik.http.services.kestra.loadbalancer.passhostheader=true"
