@@ -58,7 +58,7 @@ services:
           tasks:
             tmpDir:
               path: "/tmp/kestra-wd/tmp"
-          url: "https://localhost:8082"
+          url: "https://${KESTRA_URL}:8082"
     depends_on:
       - postgres
     networks:
